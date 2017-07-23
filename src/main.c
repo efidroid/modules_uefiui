@@ -1,23 +1,31 @@
 #include <time.h>
 #include <stdio.h>
 
+#define ENABLE_SDL 1
+
+#if ENABLE_SDL
 #include <SDL/SDL.h>
+#endif
 #include <uui/canvas.h>
 #include <uui/views/view.h>
 #include <uui/views/viewgroup.h>
 #include <uui/views/rect.h>
 #include <uui/fb.h>
-
+#if ENABLE_SDL
 static SDL_Surface *window = NULL;
 static uui_fb_t    * fb = NULL;
 static uui_canvas_t *fbcanvas = NULL;
+#endif
 
 void hw_fb_flush(uui_canvas_t *canvas, uui_point_t start, uui_size_t size) {
+#if ENABLE_SDL
     uui_canvas_copy(fbcanvas, canvas, start, start, size);
     SDL_Flip(window);
+#endif
 }
 
 void hw_mainloop_cb(void) {
+#if ENABLE_SDL
     static SDL_Event event;
 
     if(SDL_PollEvent(&event)) {
@@ -31,6 +39,7 @@ void hw_mainloop_cb(void) {
             }
         }
     }
+#endif
 }
 
 int maintest(int width, int height);
@@ -38,6 +47,7 @@ int maintest(int width, int height);
 int main(void) {
     int rc;
 
+#if ENABLE_SDL
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
         fprintf(stderr, "can't init SDL: %s\n", SDL_GetError());
         return 1;
@@ -62,9 +72,15 @@ int main(void) {
     fbcanvas = uui_canvas_framebuffer_create(fb);
 
     maintest(window->w, window->h);
+#else
+    maintest(720, 1280);
+    rc = 0;
+#endif
 
+#if ENABLE_SDL
 sdl_quit:
     SDL_Quit();
+#endif
 
     return rc;
 }
