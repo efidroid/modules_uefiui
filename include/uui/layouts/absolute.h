@@ -29,6 +29,7 @@ struct uui_layout_absolute {
     // private
     int allocated;
     listnode_t children_params;
+    uui_view_layout_t view_layout;
 };
 
 int uui_layout_absolute_initialize(uui_layout_absolute_t *absolute);

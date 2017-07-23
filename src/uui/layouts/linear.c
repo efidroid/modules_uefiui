@@ -43,7 +43,10 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
         uui_measure_spec_t child_measure_spec_height = get_child_spec(layout_size.height, lp->margin_top+lp->margin_bottom, measure_spec_height);
 
         if (linear->orientation==UUI_LAYOUT_LINEAR_ORIENTATION_VERTICAL && layout_size.width != UUI_MATCH_PARENT) {
-            childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
+            if (childview->measure && (childview->invalid_flags & UUI_INVALID_MEASURE)) {
+                childview->invalid_flags &= ~(UUI_INVALID_MEASURE);
+                childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
+            }
 
             uintn_t length = childview->measured_size.width + lp->margin_left + lp->margin_right;
             fixed_length += length;
@@ -52,7 +55,10 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
 
         }
         else if (linear->orientation==UUI_LAYOUT_LINEAR_ORIENTATION_HORIZONTAL && layout_size.height != UUI_MATCH_PARENT) {
-            childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
+            if (childview->measure && (childview->invalid_flags & UUI_INVALID_MEASURE)) {
+                childview->invalid_flags &= ~(UUI_INVALID_MEASURE);
+                childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
+            }
 
             uintn_t length = childview->measured_size.height + lp->margin_top + lp->margin_bottom;
             fixed_length += length;
@@ -104,7 +110,10 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
                 uui_measure_spec_t child_measure_spec_width = get_child_spec(layout_size.width, lp->margin_left+lp->margin_right, widthspec);
                 uui_measure_spec_t child_measure_spec_height = get_child_spec(layout_size.height, lp->margin_top+lp->margin_bottom, measure_spec_height);
 
-                childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
+                if (childview->measure && (childview->invalid_flags & UUI_INVALID_MEASURE)) {
+                    childview->invalid_flags &= ~(UUI_INVALID_MEASURE);
+                    childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
+                }
 
                 uintn_t length = childview->measured_size.width + lp->margin_left + lp->margin_right;
                 view->measured_size.width += length;
@@ -125,7 +134,10 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
                 uui_measure_spec_t child_measure_spec_width = get_child_spec(layout_size.width, lp->margin_left+lp->margin_right, measure_spec_width);
                 uui_measure_spec_t child_measure_spec_height = get_child_spec(layout_size.height, lp->margin_top+lp->margin_bottom, heightspec);
 
-                childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
+                if (childview->measure && (childview->invalid_flags & UUI_INVALID_MEASURE)) {
+                    childview->invalid_flags &= ~(UUI_INVALID_MEASURE);
+                    childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
+                }
 
                 uintn_t length = childview->measured_size.height + lp->margin_top + lp->margin_bottom;
                 view->measured_size.width = MAX(view->measured_size.width, childview->measured_size.width + lp->margin_left + lp->margin_right);
@@ -148,7 +160,11 @@ static void uui_layout_linear_layout(uui_view_t *view, uui_point_t position, uui
     uui_layoutparams_linear_t *lp;
     list_for_every_entry(&linear->children_params, lp, uui_layoutparams_linear_t, node) {
         childview = lp->view;
-        childview->layout(childview, pos, childview->measured_size);
+
+        if (childview->layout && (childview->invalid_flags & UUI_INVALID_LAYOUT)) {
+            childview->invalid_flags &= ~(UUI_INVALID_LAYOUT);
+            childview->layout(childview, pos, childview->measured_size);
+        }
 
         switch (linear->orientation) {
             case UUI_LAYOUT_LINEAR_ORIENTATION_HORIZONTAL:
@@ -174,11 +190,7 @@ static void uui_layout_linear_layout(uui_view_t *view, uui_point_t position, uui
         }
     }
 
-    view->old_computed_position = view->computed_position;
-    view->old_computed_size = view->computed_size;
-
-    view->computed_position = position;
-    view->computed_size = size;
+    linear->view_layout(view, position, size);
 }
 
 static void uui_layout_linear_set_orientation(uui_layout_linear_t *linear, uintn_t orientation) {
@@ -212,6 +224,7 @@ static uui_layoutparams_linear_t* uui_layout_linear_get_layoutparams(uui_layout_
 int uui_layout_linear_initialize(uui_layout_linear_t *linear) {
     SetMem(linear, sizeof(*linear), 0);
     uui_viewgroup_initialize(&linear->viewgroup);
+    linear->view_layout = linear->viewgroup.view.layout;
     linear->viewgroup.view.measure = uui_layout_linear_measure;
     linear->viewgroup.view.layout = uui_layout_linear_layout;
 

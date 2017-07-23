@@ -80,10 +80,13 @@ static void uui_layout_absolute_measure(uui_view_t *view, uui_measure_spec_t mea
     list_for_every_entry(&absolute->children_params, lp, uui_layoutparams_absolute_t, node) {
         childview = lp->view;
 
-        childview->measure(childview,
-            get_child_measure_spec(measure_spec_width, 0, childview->layout_size.width),
-            get_child_measure_spec(measure_spec_height, 0, childview->layout_size.height)
-        );
+        if (childview->measure && (childview->invalid_flags & UUI_INVALID_MEASURE)) {
+            childview->invalid_flags &= ~(UUI_INVALID_MEASURE);
+            childview->measure(childview,
+                get_child_measure_spec(measure_spec_width, 0, childview->layout_size.width),
+                get_child_measure_spec(measure_spec_height, 0, childview->layout_size.height)
+            );
+        }
 
         size.width = MAX(size.width, lp->position.x+childview->measured_size.width);
         size.height = MAX(size.height, lp->position.y+childview->measured_size.height);
@@ -103,14 +106,14 @@ static void uui_layout_absolute_layout(uui_view_t *view, uui_point_t position, u
     uui_layoutparams_absolute_t *lp;
     list_for_every_entry(&absolute->children_params, lp, uui_layoutparams_absolute_t, node) {
         childview = lp->view;
-        childview->layout(childview, lp->position, childview->measured_size);
+
+        if (childview->layout && (childview->invalid_flags & UUI_INVALID_LAYOUT)) {
+            childview->invalid_flags &= ~(UUI_INVALID_LAYOUT);
+            childview->layout(childview, lp->position, childview->measured_size);
+        }
     }
 
-    view->old_computed_position = view->computed_position;
-    view->old_computed_size = view->computed_size;
-
-    view->computed_position = position;
-    view->computed_size = size;
+    absolute->view_layout(view, position, size);
 }
 
 static void uui_layout_absolute_add_view(uui_layout_absolute_t *absolute, uui_view_t *view, uui_point_t position) {
@@ -136,6 +139,7 @@ static uui_layoutparams_absolute_t* uui_layout_absolute_get_layoutparams(uui_lay
 int uui_layout_absolute_initialize(uui_layout_absolute_t *absolute) {
     SetMem(absolute, sizeof(*absolute), 0);
     uui_viewgroup_initialize(&absolute->viewgroup);
+    absolute->view_layout = absolute->viewgroup.view.layout;
     absolute->viewgroup.view.measure = uui_layout_absolute_measure;
     absolute->viewgroup.view.layout = uui_layout_absolute_layout;
 

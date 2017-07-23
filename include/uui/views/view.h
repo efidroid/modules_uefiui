@@ -13,6 +13,10 @@
 
 #define UUI_MEASURED_STATE_TOO_SMALL 0x1
 
+#define UUI_INVALID_MEASURE 0x1
+#define UUI_INVALID_LAYOUT  0x2
+#define UUI_INVALID_DRAW    0x4
+
 typedef struct {
     uintn_t size;
     uint8_t mode;
@@ -25,7 +29,7 @@ typedef struct uui_view uui_view_t;
 typedef void (*uui_view_measure_t)(uui_view_t *view, uui_measure_spec_t measure_spec_width, uui_measure_spec_t measure_spec_height);
 typedef void (*uui_view_layout_t)(uui_view_t *view, uui_point_t position, uui_size_t size);
 typedef void (*uui_view_draw_t)(uui_view_t *view, uui_canvas_t *canvas);
-typedef void (*uui_view_invalidate_t)(uui_view_t *view);
+typedef void (*uui_view_invalidate_t)(uui_view_t *view, uintn_t flags, uui_rect_t *rect);
 
 struct uui_view {
     int allocated;
@@ -39,8 +43,10 @@ struct uui_view {
     uui_size_t computed_size;
     uui_point_t old_computed_position;
     uui_size_t old_computed_size;
-    uintn_t invalid;
     struct uui_viewgroup *parent;
+
+    uui_rect_t invalid_region;
+    uintn_t invalid_flags;
 
     uui_size_t layout_size;
 

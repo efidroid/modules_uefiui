@@ -38,6 +38,7 @@ struct uui_layout_linear {
     int allocated;
     uintn_t orientation;
     listnode_t children_params;
+    uui_view_layout_t view_layout;
 };
 
 int uui_layout_linear_initialize(uui_layout_linear_t *linear);

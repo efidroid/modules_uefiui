@@ -38,8 +38,20 @@ static inline uintn_t uui_size_lt(uui_size_t s1, uui_size_t s2) {
     return (s1.width<s2.width || s1.height<s2.height);
 }
 
+static inline uintn_t uui_size_eq(uui_size_t s1, uui_size_t s2) {
+    return (s1.width==s2.width && s1.height==s2.height);
+}
+
+static inline uui_size_t uui_size_add(uui_size_t s1, uui_size_t s2) {
+    return uui_size(s1.width+s2.width, s1.height+s2.height);
+}
+
 static inline uui_point_t uui_point(uintn_t x, uintn_t y) {
     return (uui_point_t) {x, y};
+}
+
+static inline uintn_t uui_point_eq(uui_point_t p1, uui_point_t p2) {
+    return (p1.x==p2.x && p1.y==p2.y);
 }
 
 static inline uui_rect_t uui_rect(uui_point_t pos, uui_size_t size) {
@@ -48,6 +60,37 @@ static inline uui_rect_t uui_rect(uui_point_t pos, uui_size_t size) {
 
 static inline uui_point_t uui_point_sub(uui_point_t p1, uui_point_t p2) {
     return uui_point(p1.x-p2.x, p1.y-p2.y);
+}
+
+static inline uui_point_t uui_point_add(uui_point_t p1, uui_point_t p2) {
+    return uui_point(p1.x+p2.x, p1.y+p2.y);
+}
+
+static inline uui_rect_t uui_rect_boundingbox(uui_rect_t r1, uui_rect_t r2) {
+    uui_rect_t rc;
+
+    if ((r1.pos.x|r1.pos.y|r1.size.width|r1.size.height)==0) {
+        return r2;
+    }
+    else if ((r2.pos.x|r2.pos.y|r2.size.width|r2.size.height)==0) {
+        return r1;
+    }
+
+    rc.pos.x = MIN(r1.pos.x, r2.pos.x);
+    rc.pos.y = MIN(r1.pos.y, r2.pos.y);
+
+    uintn_t x2 = MAX(r1.pos.x+r1.size.width, r2.pos.x+r2.size.width);
+    uintn_t y2 = MAX(r1.pos.y+r1.size.height, r2.pos.y+r2.size.height);
+
+    rc.size.width = x2 - rc.pos.x;
+    rc.size.height = y2 - rc.pos.y;
+
+    return rc;
+}
+
+static inline uintn_t uui_rect_intersect(uui_rect_t r1, uui_rect_t r2) {
+    return MAX(r1.pos.x, r2.pos.x) <= MIN(r1.pos.x+r1.size.width, r2.pos.x+r2.size.width)
+        && MAX(r1.pos.y, r2.pos.y) <= MIN(r1.pos.y+r1.size.height, r2.pos.y+r2.size.height);
 }
 
 #endif

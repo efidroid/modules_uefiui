@@ -35,13 +35,39 @@ static void uui_view_layout(uui_view_t *view, uui_point_t position, uui_size_t s
     view->old_computed_size = view->computed_size;
 
     view->computed_position = position;
-    view->computed_size =size;
+    view->computed_size = size;
+
+    if (   !uui_point_eq(view->old_computed_position, view->computed_position)
+        || !uui_size_eq(view->old_computed_size, view->computed_size)
+    )
+    {
+        uui_rect_t rect = uui_rect_boundingbox(
+                            uui_rect(view->old_computed_position, view->old_computed_size),
+                            uui_rect(view->computed_position, view->computed_size)
+                          );
+        if (view->parent)
+            view->parent->view.invalidate(&view->parent->view, UUI_INVALID_DRAW, &rect);
+    }
 }
 
-static void uui_view_invalidate(uui_view_t *view) {
-    view->invalid = 1;
-    if (view->parent)
-        view->parent->view.invalidate(&view->parent->view);
+static void uui_view_invalidate(uui_view_t *view, uintn_t flags, uui_rect_t *rect) {
+    view->invalid_flags |= flags;
+
+    if (flags & UUI_INVALID_DRAW) {
+        ASSERT(rect);
+        view->invalid_region = uui_rect_boundingbox(view->invalid_region, *rect);
+
+        if (view->parent) {
+            uui_rect_t parentrect = uui_rect(uui_point_add(view->computed_position, rect->pos), rect->size);
+            view->parent->view.invalidate(&view->parent->view, flags, &parentrect);
+        }
+    }
+    else {
+        ASSERT(!rect);
+        if (view->parent) {
+            view->parent->view.invalidate(&view->parent->view, flags, rect);
+        }
+    }
 }
 
 int uui_view_initialize(uui_view_t *view) {
@@ -51,7 +77,8 @@ int uui_view_initialize(uui_view_t *view) {
     view->draw = NULL;
     view->invalidate = uui_view_invalidate;
 
-    view->invalid = 1;
+    view->invalid_flags = UUI_INVALID_MEASURE|UUI_INVALID_LAYOUT|UUI_INVALID_DRAW;
+    view->invalid_region = uui_rect(uui_point(0, 0), uui_size((uintn_t)-1, (uintn_t)-1));
     view->parent = NULL;
 
     view->layout_size = uui_size(UUI_WRAP_CONTENT, UUI_WRAP_CONTENT);

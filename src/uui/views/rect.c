@@ -6,7 +6,7 @@ static void uui_view_rect_draw(uui_view_t *view, uui_canvas_t *canvas) {
     uui_view_rect_t* rect = containerof(view, uui_view_rect_t, view);
 
     canvas->color = rect->color;
-    canvas->draw_rect(canvas, uui_point(0, 0), canvas->size);
+    canvas->draw_rect(canvas, view->invalid_region.pos, view->invalid_region.size);
 }
 
 int uui_view_rect_initialize(uui_view_rect_t *rect) {
