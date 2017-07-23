@@ -1,6 +1,6 @@
 #include <uui/layouts/linear.h>
 
-static inline uui_measure_spec_t get_child_spec(uintn_t size, uintn_t margin, uui_measure_spec_t measure_spec) {
+static inline uui_measure_spec_t get_child_spec(intn_t size, intn_t margin, uui_measure_spec_t measure_spec) {
     uui_measure_spec_t childspec;
     switch (size) {
         case UUI_WRAP_CONTENT:
@@ -27,7 +27,7 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
     uui_view_t *childview;
     uui_layoutparams_linear_t *lp;
 
-    uintn_t fixed_length = 0;
+    intn_t fixed_length = 0;
     uintn_t num_match_parents = 0;
     uintn_t match_parents_weight_sum = 0;
 
@@ -48,7 +48,7 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
                 childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
             }
 
-            uintn_t length = childview->measured_size.width + lp->margin_left + lp->margin_right;
+            intn_t length = childview->measured_size.width + lp->margin_left + lp->margin_right;
             fixed_length += length;
             view->measured_size.width += length;
             view->measured_size.height = MAX(view->measured_size.height, childview->measured_size.height + lp->margin_top + lp->margin_bottom);
@@ -60,7 +60,7 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
                 childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
             }
 
-            uintn_t length = childview->measured_size.height + lp->margin_top + lp->margin_bottom;
+            intn_t length = childview->measured_size.height + lp->margin_top + lp->margin_bottom;
             fixed_length += length;
             view->measured_size.width = MAX(view->measured_size.width, childview->measured_size.width + lp->margin_left + lp->margin_right);
             view->measured_size.height += length;
@@ -72,7 +72,7 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
     }
 
     if (num_match_parents) {
-        uintn_t matchparent_length;
+        intn_t matchparent_length;
         switch (linear->orientation) {
             case UUI_LAYOUT_LINEAR_ORIENTATION_HORIZONTAL:
                 matchparent_length = (measure_spec_height.size-fixed_length)/match_parents_weight_sum;
@@ -101,7 +101,7 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
 
                 // account for rounding
                 if (i==num_match_parents-1) {
-                    uintn_t diff = (measure_spec_width.size-fixed_length) - matchparent_length*match_parents_weight_sum;
+                    intn_t diff = (measure_spec_width.size-fixed_length) - matchparent_length*match_parents_weight_sum;
                     if(diff) {
                         widthspec.size += diff;
                     }
@@ -115,7 +115,7 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
                     childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
                 }
 
-                uintn_t length = childview->measured_size.width + lp->margin_left + lp->margin_right;
+                intn_t length = childview->measured_size.width + lp->margin_left + lp->margin_right;
                 view->measured_size.width += length;
                 view->measured_size.height = MAX(view->measured_size.height, childview->measured_size.height + lp->margin_top + lp->margin_bottom);
 
@@ -125,7 +125,7 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
 
                 // account for rounding
                 if (i==num_match_parents-1) {
-                    uintn_t diff = (measure_spec_height.size-fixed_length) - matchparent_length*match_parents_weight_sum;
+                    intn_t diff = (measure_spec_height.size-fixed_length) - matchparent_length*match_parents_weight_sum;
                     if(diff) {
                         heightspec.size += diff;
                     }
@@ -139,7 +139,7 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
                     childview->measure(childview, child_measure_spec_width, child_measure_spec_height);
                 }
 
-                uintn_t length = childview->measured_size.height + lp->margin_top + lp->margin_bottom;
+                intn_t length = childview->measured_size.height + lp->margin_top + lp->margin_bottom;
                 view->measured_size.width = MAX(view->measured_size.width, childview->measured_size.width + lp->margin_left + lp->margin_right);
                 view->measured_size.height += length;
             }

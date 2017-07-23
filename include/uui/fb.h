@@ -22,7 +22,7 @@ static inline uui_pixel_t uui_pixel(uint8_t blue, uint8_t green, uint8_t red, ui
     return (uui_pixel_t) {blue, green, red, reserved};
 }
 
-uui_fb_t *uui_fb_alloc(uintn_t width, uintn_t height);
+uui_fb_t *uui_fb_alloc(intn_t width, intn_t height);
 void uui_fb_free(uui_fb_t *fb);
 void uui_fb_reset_dirty_region(uui_fb_t *fb);
 
@@ -42,7 +42,7 @@ static inline void uui_fb_mark_dirty_startsize(uui_fb_t *fb, uui_point_t start, 
     uui_fb_mark_dirty_startend(fb, start, end);
 }
 
-static inline void uui_fb_mark_dirty_startend_xy(uui_fb_t *fb, uintn_t startx, uintn_t starty, uintn_t endx, uintn_t endy) {
+static inline void uui_fb_mark_dirty_startend_xy(uui_fb_t *fb, intn_t startx, intn_t starty, intn_t endx, intn_t endy) {
     uui_point_t start = {startx, starty};
     uui_point_t end = {endx, endy};
     uui_fb_mark_dirty_startend(fb, start, end);

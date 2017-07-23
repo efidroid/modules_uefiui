@@ -24,19 +24,19 @@ static void uui_view_viewgroup_draw(uui_view_t *view, uui_canvas_t *canvas) {
 
         if(childview->draw && redraw) {
 #if 1
-            int64_t p0x = ((int64_t)view->invalid_region.pos.x) - ((int64_t)childview->computed_position.x);
-            int64_t p0y = ((int64_t)view->invalid_region.pos.y) - ((int64_t)childview->computed_position.y);
+            intn_t p0x = (view->invalid_region.pos.x) - (childview->computed_position.x);
+            intn_t p0y = (view->invalid_region.pos.y) - (childview->computed_position.y);
             //uui_point_t p0 = uui_point_sub(view->invalid_region.pos, childview->computed_position);
             //uui_point_t p1 = uui_point(p0.x+view->invalid_region.size.width, p0.y+view->invalid_region.size.height);
-            int64_t p1x = p0x+view->invalid_region.size.width;
-            int64_t p1y = p0y+view->invalid_region.size.height;
+            intn_t p1x = p0x+view->invalid_region.size.width;
+            intn_t p1y = p0y+view->invalid_region.size.height;
 
             childview->invalid_flags &= ~(UUI_INVALID_DRAW);
-            childview->invalid_region = uui_rect(uui_point((uintn_t)MAX(0ll, p0x), (uintn_t)MAX(0ll, p0y)),
+            childview->invalid_region = uui_rect(uui_point((intn_t)MAX(0ll, p0x), (intn_t)MAX(0ll, p0y)),
                 uui_size(
-                    (uintn_t)(MIN((int64_t)childview->computed_size.width, p1x)-MAX(0ll, p0x)),
-                    (uintn_t)(MIN((int64_t)childview->computed_size.height, p1y)-MAX(0ll, p0y)))
-                );
+                    MIN(childview->computed_size.width, p1x)-MAX(0ll, p0x),
+                    MIN(childview->computed_size.height, p1y)-MAX(0ll, p0y)
+                ));
 
             childview->draw(childview, canvas);
             childview->invalid_region = uui_rect(uui_point(0, 0), uui_size(0, 0));

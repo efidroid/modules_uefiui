@@ -3,7 +3,7 @@
 #include <uui/canvas.h>
 
 static void uui_canvas_draw_rect(uui_canvas_t *canvas, uui_point_t dst, uui_size_t size) {
-    uintn_t x, y;
+    intn_t x, y;
 
     // 0 means max
     if (size.width==0)
@@ -11,9 +11,25 @@ static void uui_canvas_draw_rect(uui_canvas_t *canvas, uui_point_t dst, uui_size
     if (size.height==0)
         size.height = canvas->size.height;
 
+    // draw positive area only
+    if (dst.x<0) {
+        intn_t diff = (-dst.x);
+        size.width -= diff;
+        dst.x += diff;
+    }
+    if (dst.y<0) {
+        intn_t diff = (-dst.y);
+        size.height -= diff;
+        dst.y += diff;
+    }
+
+    // don't draw infinitely small rects
+    if (size.width<0 || size.height<0)
+        return;
+
     // this allows the canvas to be bigger than the buffer
-    uintn_t max_x = MIN(canvas->offset.x + canvas->size.width, canvas->fb->size.width);
-    uintn_t max_y = MIN(canvas->offset.y + canvas->size.height, canvas->fb->size.height);
+    intn_t max_x = MIN(canvas->offset.x + canvas->size.width, canvas->fb->size.width);
+    intn_t max_y = MIN(canvas->offset.y + canvas->size.height, canvas->fb->size.height);
 
     uui_point_t draw_start = {canvas->offset.x + dst.x, canvas->offset.y + dst.y};
     uui_point_t draw_end = {MIN(draw_start.x + size.width, max_x), MIN(draw_start.y + size.height, max_y)};
@@ -65,18 +81,37 @@ static uui_canvas_boundary_t* uui_canvas_boundary_pop(uui_canvas_t *canvas, uint
 }
 
 void uui_canvas_copy(uui_canvas_t *canvas_dst, uui_canvas_t *canvas_src, uui_point_t dst, uui_point_t src, uui_size_t size) {
-    uintn_t y;
+    intn_t y;
 
+    // 0 means max
     if (size.width==0)
         size.width = canvas_src->size.width;
     if (size.height==0)
         size.height = canvas_src->size.height;
 
+    // draw positive area only
+    if (dst.x<0) {
+        intn_t diff = (-dst.x);
+        size.width -= diff;
+        dst.x += diff;
+        src.x += diff;
+    }
+    if (dst.y<0) {
+        intn_t diff = (-dst.y);
+        size.height -= diff;
+        dst.y += diff;
+        src.y += diff;
+    }
+
+    // don't copy infinitely small canvas'
+    if (size.width<0 || size.height<0)
+        return;
+
     // this allows the canvas to be bigger than the buffer
-    uintn_t dst_max_x = MIN(canvas_dst->offset.x + canvas_dst->size.width, canvas_dst->fb->size.width);
-    uintn_t dst_max_y = MIN(canvas_dst->offset.y + canvas_dst->size.height, canvas_dst->fb->size.height);
-    uintn_t src_max_x = MIN(canvas_src->offset.x + canvas_src->size.width, canvas_src->fb->size.width);
-    uintn_t src_max_y = MIN(canvas_src->offset.y + canvas_src->size.height, canvas_src->fb->size.height);
+    intn_t dst_max_x = MIN(canvas_dst->offset.x + canvas_dst->size.width, canvas_dst->fb->size.width);
+    intn_t dst_max_y = MIN(canvas_dst->offset.y + canvas_dst->size.height, canvas_dst->fb->size.height);
+    intn_t src_max_x = MIN(canvas_src->offset.x + canvas_src->size.width, canvas_src->fb->size.width);
+    intn_t src_max_y = MIN(canvas_src->offset.y + canvas_src->size.height, canvas_src->fb->size.height);
 
     uui_point_t dst_draw_start = {canvas_dst->offset.x + dst.x, canvas_dst->offset.y + dst.y};
     uui_point_t dst_draw_end = {MIN(dst_draw_start.x + size.width, dst_max_x), MIN(dst_draw_start.y + size.height, dst_max_y)};
@@ -93,12 +128,12 @@ void uui_canvas_copy(uui_canvas_t *canvas_dst, uui_canvas_t *canvas_src, uui_poi
     if (dst_draw_end.y<dst_draw_start.y)
         return;
 
-    uintn_t copy_max_y = MIN(src_draw_end.y-src_draw_start.y, dst_draw_end.y-dst_draw_start.y);
-    uintn_t copy_max_x = MIN(src_draw_end.x-src_draw_start.x, dst_draw_end.x-dst_draw_start.x);
+    intn_t copy_max_y = MIN(src_draw_end.y-src_draw_start.y, dst_draw_end.y-dst_draw_start.y);
+    intn_t copy_max_x = MIN(src_draw_end.x-src_draw_start.x, dst_draw_end.x-dst_draw_start.x);
 
     for (y=0; y<copy_max_y; y++) {
-        uintn_t y_src = src_draw_start.y + y;
-        uintn_t y_dst = dst_draw_start.y + y;
+        intn_t y_src = src_draw_start.y + y;
+        intn_t y_dst = dst_draw_start.y + y;
 
         uui_pixel_t *srcbuf = &canvas_src->fb->pixels[y_src*canvas_src->fb->size.width + src_draw_start.x];
         uui_pixel_t *dstbuf = &canvas_dst->fb->pixels[y_dst*canvas_dst->fb->size.width + dst_draw_start.x];
@@ -123,7 +158,10 @@ int uui_canvas_framebuffer_initialize(uui_canvas_t *canvas, uui_fb_t *fb) {
     return 0;
 }
 
-int uui_canvas_initialize(uui_canvas_t *canvas, uintn_t width, uintn_t height) {
+int uui_canvas_initialize(uui_canvas_t *canvas, intn_t width, intn_t height) {
+    if (width<0 || height<0)
+        return -1;
+
     uui_fb_t *fb = uui_fb_alloc(width, height);
     if (fb==NULL)
         return -1;
@@ -138,7 +176,7 @@ int uui_canvas_initialize(uui_canvas_t *canvas, uintn_t width, uintn_t height) {
     return 0;
 }
 
-uui_canvas_t *uui_canvas_create(uintn_t width, uintn_t height) {
+uui_canvas_t *uui_canvas_create(intn_t width, intn_t height) {
     uui_canvas_t *o;
     UUI_CREATE_IMPLEMENTATION(o, uui_canvas_initialize, width, height);
     o->allocated = 1;

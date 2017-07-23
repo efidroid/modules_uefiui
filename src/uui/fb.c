@@ -2,7 +2,10 @@
 
 #include <uui/fb.h>
 
-uui_fb_t *uui_fb_alloc(uintn_t width, uintn_t height) {
+uui_fb_t *uui_fb_alloc(intn_t width, intn_t height) {
+    if (width<0 || height<0)
+        return NULL;
+
     uui_pixel_t *pixels = AllocateZeroPool(width * height * sizeof(uui_pixel_t));
     if (pixels==NULL)
         return NULL;

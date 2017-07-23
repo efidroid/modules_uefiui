@@ -16,13 +16,13 @@
 } while(0)
 
 typedef struct {
-    uintn_t width;
-    uintn_t height;
+    intn_t width;
+    intn_t height;
 } uui_size_t;
 
 typedef struct {
-    uintn_t x;
-    uintn_t y;
+    intn_t x;
+    intn_t y;
 } uui_point_t;
 
 typedef struct {
@@ -30,7 +30,7 @@ typedef struct {
     uui_size_t size;
 } uui_rect_t;
 
-static inline uui_size_t uui_size(uintn_t width, uintn_t height) {
+static inline uui_size_t uui_size(intn_t width, intn_t height) {
     return (uui_size_t) {width, height};
 }
 
@@ -46,7 +46,7 @@ static inline uui_size_t uui_size_add(uui_size_t s1, uui_size_t s2) {
     return uui_size(s1.width+s2.width, s1.height+s2.height);
 }
 
-static inline uui_point_t uui_point(uintn_t x, uintn_t y) {
+static inline uui_point_t uui_point(intn_t x, intn_t y) {
     return (uui_point_t) {x, y};
 }
 
@@ -79,8 +79,8 @@ static inline uui_rect_t uui_rect_boundingbox(uui_rect_t r1, uui_rect_t r2) {
     rc.pos.x = MIN(r1.pos.x, r2.pos.x);
     rc.pos.y = MIN(r1.pos.y, r2.pos.y);
 
-    uintn_t x2 = MAX(r1.pos.x+r1.size.width, r2.pos.x+r2.size.width);
-    uintn_t y2 = MAX(r1.pos.y+r1.size.height, r2.pos.y+r2.size.height);
+    intn_t x2 = MAX(r1.pos.x+r1.size.width, r2.pos.x+r2.size.width);
+    intn_t y2 = MAX(r1.pos.y+r1.size.height, r2.pos.y+r2.size.height);
 
     rc.size.width = x2 - rc.pos.x;
     rc.size.height = y2 - rc.pos.y;

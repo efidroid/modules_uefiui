@@ -3,8 +3,8 @@
 #include <uui/views/view.h>
 #include <uui/views/viewgroup.h>
 
-static inline uintn_t get_default_size(uintn_t size, uui_measure_spec_t measure_spec) {
-    uintn_t result = size;
+static inline intn_t get_default_size(intn_t size, uui_measure_spec_t measure_spec) {
+    intn_t result = size;
 
     switch (measure_spec.mode) {
     case UUI_UNSPECIFIED:
@@ -78,7 +78,7 @@ int uui_view_initialize(uui_view_t *view) {
     view->invalidate = uui_view_invalidate;
 
     view->invalid_flags = UUI_INVALID_MEASURE|UUI_INVALID_LAYOUT|UUI_INVALID_DRAW;
-    view->invalid_region = uui_rect(uui_point(0, 0), uui_size((uintn_t)-1, (uintn_t)-1));
+    view->invalid_region = uui_rect(uui_point(0, 0), uui_size(UUI_INTN_MAX, UUI_INTN_MAX));
     view->parent = NULL;
 
     view->layout_size = uui_size(UUI_WRAP_CONTENT, UUI_WRAP_CONTENT);

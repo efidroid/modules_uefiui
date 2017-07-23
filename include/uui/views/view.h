@@ -4,8 +4,9 @@
 #include <uui/common.h>
 #include <uui/canvas.h>
 
-#define UUI_MATCH_PARENT ((uintn_t)-1)
-#define UUI_WRAP_CONTENT ((uintn_t)-2)
+#define UUI_INTN_MAX ((intn_t)(((uintn_t)-1)/2))
+#define UUI_MATCH_PARENT (UUI_INTN_MAX - 0)
+#define UUI_WRAP_CONTENT (UUI_INTN_MAX - 1)
 
 #define UUI_AT_MOST      0x8
 #define UUI_EXACTLY      0x4
@@ -18,7 +19,7 @@
 #define UUI_INVALID_DRAW    0x4
 
 typedef struct {
-    uintn_t size;
+    intn_t size;
     uint8_t mode;
 } uui_measure_spec_t;
 
@@ -39,7 +40,7 @@ struct uui_view {
 
     // set by layout manager
     uui_size_t measured_size;
-    uintn_t measured_state[2];
+    intn_t measured_state[2];
     uui_point_t computed_position;
     uui_size_t computed_size;
     uui_point_t old_computed_position;
@@ -62,11 +63,11 @@ int uui_view_initialize(uui_view_t *view);
 uui_view_t* uui_view_create(void);
 void uui_view_free(uui_view_t *view);
 
-static inline uui_measure_spec_t uui_measure_spec(uintn_t size, uint8_t mode) {
+static inline uui_measure_spec_t uui_measure_spec(intn_t size, uint8_t mode) {
     return (uui_measure_spec_t) {size, mode};
 }
 
-static inline void uui_resolve_size_and_state(uintn_t *psize, uintn_t *pstate, uui_measure_spec_t measure_spec) {
+static inline void uui_resolve_size_and_state(intn_t *psize, intn_t *pstate, uui_measure_spec_t measure_spec) {
     switch (measure_spec.mode) {
         case UUI_AT_MOST:
             if (measure_spec.size < *psize) {

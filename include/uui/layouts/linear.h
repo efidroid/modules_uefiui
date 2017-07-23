@@ -14,10 +14,10 @@ typedef struct {
     uui_view_t *view;
 
     uintn_t weight;
-    uintn_t margin_left;
-    uintn_t margin_top;
-    uintn_t margin_right;
-    uintn_t margin_bottom;
+    intn_t margin_left;
+    intn_t margin_top;
+    intn_t margin_right;
+    intn_t margin_bottom;
 } uui_layoutparams_linear_t;
 
 typedef struct uui_layout_linear uui_layout_linear_t;

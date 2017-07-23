@@ -1,11 +1,11 @@
 #include <uui/layouts/absolute.h>
 
-static uui_measure_spec_t get_child_measure_spec(uui_measure_spec_t spec, uintn_t padding, uintn_t childDimension) {
-    uintn_t specSize = spec.size;
+static uui_measure_spec_t get_child_measure_spec(uui_measure_spec_t spec, intn_t padding, intn_t childDimension) {
+    intn_t specSize = spec.size;
 
-    uintn_t size = specSize - padding;
+    intn_t size = specSize - padding;
 
-    uintn_t resultSize = 0;
+    intn_t resultSize = 0;
     uint8_t resultMode = 0;
 
     switch (spec.mode) {

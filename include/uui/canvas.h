@@ -38,8 +38,8 @@ struct uui_canvas {
     uui_canvas_draw_rect_t draw_rect;
 };
 
-int uui_canvas_initialize(uui_canvas_t *canvas, uintn_t width, uintn_t height);
-uui_canvas_t *uui_canvas_create(uintn_t width, uintn_t height);
+int uui_canvas_initialize(uui_canvas_t *canvas, intn_t width, intn_t height);
+uui_canvas_t *uui_canvas_create(intn_t width, intn_t height);
 
 int uui_canvas_framebuffer_initialize(uui_canvas_t *canvas, uui_fb_t *fb);
 uui_canvas_t *uui_canvas_framebuffer_create(uui_fb_t *fb);
