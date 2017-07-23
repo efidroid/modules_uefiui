@@ -114,7 +114,7 @@ static void uui_layout_absolute_layout(uui_view_t *view, uui_point_t position, u
 }
 
 static void uui_layout_absolute_add_view(uui_layout_absolute_t *absolute, uui_view_t *view, uui_point_t position) {
-    uui_layoutparams_absolute_t *lp = malloc(sizeof(uui_layoutparams_absolute_t));
+    uui_layoutparams_absolute_t *lp = AllocatePool(sizeof(uui_layoutparams_absolute_t));
     if (!lp) return;
 
     lp->view = view;
@@ -134,7 +134,7 @@ static uui_layoutparams_absolute_t* uui_layout_absolute_get_layoutparams(uui_lay
 }
 
 int uui_layout_absolute_initialize(uui_layout_absolute_t *absolute) {
-    memset(absolute, sizeof(*absolute), 0);
+    SetMem(absolute, sizeof(*absolute), 0);
     uui_viewgroup_initialize(&absolute->viewgroup);
     absolute->viewgroup.view.measure = uui_layout_absolute_measure;
     absolute->viewgroup.view.layout = uui_layout_absolute_layout;

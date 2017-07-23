@@ -45,12 +45,12 @@ static inline void list_clear_node(struct list_node *item)
     item->prev = item->next = 0;
 }
 
-static inline bool list_in_list(struct list_node *item)
+static inline BOOLEAN list_in_list(struct list_node *item)
 {
     if (item->prev == 0 && item->next == 0)
-        return false;
+        return FALSE;
     else
-        return true;
+        return TRUE;
 }
 
 static inline void list_add_head(struct list_node *list, struct list_node *item)
@@ -261,9 +261,9 @@ static inline struct list_node *list_next_wrap(struct list_node *list, struct li
         &(entry)->member != (list);\
         entry = temp_entry, temp_entry = containerof((temp_entry)->member.next, type, member))
 
-static inline bool list_is_empty(struct list_node *list)
+static inline BOOLEAN list_is_empty(struct list_node *list)
 {
-    return (list->next == list) ? true : false;
+    return (list->next == list) ? TRUE : FALSE;
 }
 
 static inline size_t list_length(struct list_node *list)

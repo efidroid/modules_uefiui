@@ -102,7 +102,7 @@ void uui_canvas_copy(uui_canvas_t *canvas_dst, uui_canvas_t *canvas_src, uui_poi
 
         uui_pixel_t *srcbuf = &canvas_src->fb->pixels[y_src*canvas_src->fb->size.width + src_draw_start.x];
         uui_pixel_t *dstbuf = &canvas_dst->fb->pixels[y_dst*canvas_dst->fb->size.width + dst_draw_start.x];
-        memcpy(dstbuf, srcbuf, copy_max_x*sizeof(uui_pixel_t));
+        CopyMem(dstbuf, srcbuf, copy_max_x*sizeof(uui_pixel_t));
     }
 
     uui_point_t dirty_end = uui_point(dst_draw_start.x + copy_max_x, dst_draw_end.y + copy_max_y);
@@ -110,7 +110,7 @@ void uui_canvas_copy(uui_canvas_t *canvas_dst, uui_canvas_t *canvas_src, uui_poi
 }
 
 int uui_canvas_framebuffer_initialize(uui_canvas_t *canvas, uui_fb_t *fb) {
-    memset(canvas, 0, sizeof(*canvas));
+    SetMem(canvas, sizeof(*canvas), 0);
 
     list_initialize(&canvas->boundary_stack);
     canvas->fb = fb;

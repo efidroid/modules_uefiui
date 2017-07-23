@@ -45,7 +45,7 @@ static void uui_view_invalidate(uui_view_t *view) {
 }
 
 int uui_view_initialize(uui_view_t *view) {
-    memset(view, 0, sizeof(*view));
+    SetMem(view, sizeof(*view), 0);
     view->measure = uui_view_measure;
     view->layout = uui_view_layout;
     view->draw = NULL;

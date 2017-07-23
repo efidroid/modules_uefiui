@@ -47,7 +47,7 @@ uui_view_rect_t *g_touch_rect = NULL;
 
 int maintest(int width, int height) {
     int rc;
-    context_t *context = calloc(sizeof(context_t), 1);
+    context_t *context = AllocateZeroPool(sizeof(context_t));
 
     // init context
     context->fb = uui_fb_alloc(width, height);

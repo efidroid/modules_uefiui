@@ -48,7 +48,7 @@ static void uui_viewgroup_internal_add_view(uui_viewgroup_t *viewgroup, uui_view
 }
 
 int uui_viewgroup_initialize(uui_viewgroup_t *viewgroup) {
-    memset(viewgroup, 0, sizeof(*viewgroup));
+    SetMem(viewgroup, sizeof(*viewgroup), 0);
 
     uui_view_initialize(&viewgroup->view);
     viewgroup->view.measure = uui_viewgroup_measure;

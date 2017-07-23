@@ -16,6 +16,6 @@
 #endif
 
 #define containerof(ptr, type, member) \
-    ((type *)((uintn_t)(ptr) - offsetof(type, member)))
+    ((type *)((uintn_t)(ptr) - OFFSET_OF(type, member)))
 
 #endif

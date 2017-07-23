@@ -186,7 +186,7 @@ static void uui_layout_linear_set_orientation(uui_layout_linear_t *linear, uintn
 }
 
 static void uui_layout_linear_add_view(uui_layout_linear_t *linear, uui_view_t *view) {
-    uui_layoutparams_linear_t *lp = malloc(sizeof(uui_layoutparams_linear_t));
+    uui_layoutparams_linear_t *lp = AllocatePool(sizeof(uui_layoutparams_linear_t));
     if (!lp) return;
 
     lp->view = view;
@@ -210,7 +210,7 @@ static uui_layoutparams_linear_t* uui_layout_linear_get_layoutparams(uui_layout_
 }
 
 int uui_layout_linear_initialize(uui_layout_linear_t *linear) {
-    memset(linear, sizeof(*linear), 0);
+    SetMem(linear, sizeof(*linear), 0);
     uui_viewgroup_initialize(&linear->viewgroup);
     linear->viewgroup.view.measure = uui_layout_linear_measure;
     linear->viewgroup.view.layout = uui_layout_linear_layout;

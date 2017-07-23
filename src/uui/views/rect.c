@@ -10,7 +10,7 @@ static void uui_view_rect_draw(uui_view_t *view, uui_canvas_t *canvas) {
 }
 
 int uui_view_rect_initialize(uui_view_rect_t *rect) {
-    memset(rect, 0, sizeof(*rect));
+    SetMem(rect, sizeof(*rect), 0);
     uui_view_initialize(&rect->view);
     rect->view.draw = uui_view_rect_draw;
 

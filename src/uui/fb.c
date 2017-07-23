@@ -3,11 +3,11 @@
 #include <uui/fb.h>
 
 uui_fb_t *uui_fb_alloc(uintn_t width, uintn_t height) {
-    uui_pixel_t *pixels = calloc(width * height * sizeof(uui_pixel_t), 1);
+    uui_pixel_t *pixels = AllocateZeroPool(width * height * sizeof(uui_pixel_t));
     if (pixels==NULL)
         return NULL;
 
-    uui_fb_t *fb = calloc(sizeof(uui_fb_t), 1);
+    uui_fb_t *fb = AllocateZeroPool(sizeof(uui_fb_t));
     if (fb==NULL) {
         FreePool(pixels);
         return NULL;
