@@ -7,8 +7,6 @@
 #include <uui/layouts/linear.h>
 #include <uui/layouts/absolute.h>
 
-#include <stdio.h>
-
 typedef struct {
     uui_fb_t *fb;
 
@@ -20,22 +18,6 @@ void hw_fb_flush(uui_canvas_t *canvas, uui_point_t start, uui_size_t size);
 void hw_mainloop_cb(void);
 
 static void fb_flush(context_t *context) {
-#if 0
-    context->fb->dirtyregion_start.x = 0;
-    context->fb->dirtyregion_start.y = 0;
-    context->fb->dirtyregion_end.x = context->fb->size.width;
-    context->fb->dirtyregion_end.y = context->fb->size.height;
-#endif
-
-#if 0
-    printf("%ux%u - %ux%u\n",
-        context->fb->dirtyregion_start.x,
-        context->fb->dirtyregion_start.y,
-        context->fb->dirtyregion_end.x,
-        context->fb->dirtyregion_end.y
-    );
-#endif
-
     if ((context->fb->dirtyregion_end.x > context->fb->dirtyregion_start.x) && (context->fb->dirtyregion_end.y > context->fb->dirtyregion_start.y)) {
         uui_size_t size = {context->fb->dirtyregion_end.x-context->fb->dirtyregion_start.x, context->fb->dirtyregion_end.y-context->fb->dirtyregion_start.y};
         hw_fb_flush(context->fbcanvas, context->fb->dirtyregion_start, size);
@@ -152,9 +134,11 @@ int maintest(int width, int height) {
     linear->add_view(linear, &rect->view);
     }
 
+    uui_view_rect_t *rect_c3 = NULL;
     {
     // add rect
     uui_view_rect_t *rect = uui_view_rect_create();
+    rect_c3 = rect;
     rect->color = uui_pixel(255, 255, 0, 0);
     rect->view.layout_size = uui_size(UUI_MATCH_PARENT, UUI_MATCH_PARENT);
     rect->view.id = "c3";
@@ -199,27 +183,37 @@ int maintest(int width, int height) {
     uui_layoutparams_absolute_t *lp_debugrect = absolute->get_layoutparams(absolute, &rect->view);
 
     uui_canvas_boundary_t boundary = {.offset = uui_point(0, 0), .size = uui_size(0, 0)};
-    int first = 1;
     int dir = 0;
     for(;;) {
         hw_mainloop_cb();
 
-        if(first) {
-            context->rootview->measure(context->rootview, uui_measure_spec(context->fb->size.width, UUI_EXACTLY), uui_measure_spec(context->fb->size.height, UUI_EXACTLY));
-            context->rootview->layout(context->rootview, uui_point(0, 0), context->rootview->measured_size);
-            //first = 0;
+        if (context->rootview->invalid_flags & UUI_INVALID_MEASURE) {
+            context->rootview->invalid_flags &= ~(UUI_INVALID_MEASURE);
+            if (context->rootview->measure)
+                context->rootview->measure(context->rootview, uui_measure_spec(context->fb->size.width, UUI_EXACTLY), uui_measure_spec(context->fb->size.height, UUI_EXACTLY));
         }
-        if (context->rootview->draw) {
-            // apply boundary
-            boundary.offset = context->rootview->computed_position;
-            boundary.size = context->rootview->computed_size;
-            context->fbcanvas->boundary_push(context->fbcanvas, &boundary, 1);
 
-            // draw
-            context->rootview->draw(context->rootview, context->fbcanvas);
+        if (context->rootview->invalid_flags & UUI_INVALID_LAYOUT) {
+            context->rootview->invalid_flags &= ~(UUI_INVALID_LAYOUT);
+            if (context->rootview->layout)
+                context->rootview->layout(context->rootview, uui_point(0, 0), context->rootview->measured_size);
+        }
 
-            // remove boundary
-            context->fbcanvas->boundary_pop(context->fbcanvas, 1);
+        if (context->rootview->invalid_flags & UUI_INVALID_DRAW) {
+            context->rootview->invalid_flags &= ~(UUI_INVALID_DRAW);
+            if (context->rootview->draw) {
+                // apply boundary
+                boundary.offset = context->rootview->computed_position;
+                boundary.size = context->rootview->computed_size;
+                context->fbcanvas->boundary_push(context->fbcanvas, &boundary, 1);
+
+                // draw
+                context->rootview->draw(context->rootview, context->fbcanvas);
+
+                // remove boundary
+                context->fbcanvas->boundary_pop(context->fbcanvas, 1);
+            }
+            context->rootview->invalid_region = uui_rect(uui_point(0, 0), uui_size(0, 0));
         }
 
 #if 1
@@ -231,7 +225,17 @@ int maintest(int width, int height) {
         if (lp_debugrect->position.y >= context->fb->size.height)
             dir = !dir;
 
-        rect->view.invalidate(&rect->view);
+        rect->view.invalidate(&rect->view, UUI_INVALID_LAYOUT, NULL);
+#else
+        (void)(lp_debugrect);
+        (void)(dir);
+#endif
+
+#if 1
+        uui_rect_t ir = uui_rect(rect_c3->view.computed_position, rect_c3->view.computed_size);
+        rect_c3->view.invalidate(&rect_c3->view, UUI_INVALID_DRAW, &ir);
+#else
+        (void)(rect_c3);
 #endif
 
         // flush
