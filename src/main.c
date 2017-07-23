@@ -45,7 +45,7 @@ void hw_mainloop_cb(void) {
 int maintest(int width, int height);
 
 int main(void) {
-    int rc;
+    int rc = 0;
 
 #if ENABLE_SDL
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
