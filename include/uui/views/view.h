@@ -35,6 +35,7 @@ struct uui_view {
     int allocated;
 
     listnode_t node;
+    const char *id;
 
     // set by layout manager
     uui_size_t measured_size;
