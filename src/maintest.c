@@ -183,7 +183,7 @@ int maintest(int width, int height) {
     uui_layoutparams_absolute_t *lp_debugrect = absolute->get_layoutparams(absolute, &rect->view);
 
     uui_canvas_boundary_t boundary = {.offset = uui_point(0, 0), .size = uui_size(0, 0)};
-    int dir = 0;
+    int dir = 1;
     for(;;) {
         hw_mainloop_cb();
 
@@ -223,7 +223,9 @@ int maintest(int width, int height) {
             lp_debugrect->position.y-=1;
 
         if (lp_debugrect->position.y >= context->fb->size.height)
-            dir = !dir;
+            dir = 0;
+        else if (lp_debugrect->position.y <=0)
+            dir = 1;
 
         rect->view.invalidate(&rect->view, UUI_INVALID_LAYOUT, NULL);
 #else
