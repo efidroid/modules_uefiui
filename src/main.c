@@ -11,7 +11,6 @@
 static SDL_Surface *window = NULL;
 static uui_fb_t    * fb = NULL;
 static uui_canvas_t *fbcanvas = NULL;
-extern uui_view_rect_t *g_touch_rect;
 
 void hw_fb_flush(uui_canvas_t *canvas, uui_point_t start, uui_size_t size) {
     uui_canvas_copy(fbcanvas, canvas, start, start, size);
@@ -29,10 +28,6 @@ void hw_mainloop_cb(void) {
 
         if (event.type == SDL_MOUSEMOTION) {
             if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
-                if (g_touch_rect) {
-                    g_touch_rect->view.computed_position.x = event.motion.x - g_touch_rect->view.computed_size.width/2;
-                    g_touch_rect->view.computed_position.y = event.motion.y - g_touch_rect->view.computed_size.height/2;
-                }
             }
         }
     }
