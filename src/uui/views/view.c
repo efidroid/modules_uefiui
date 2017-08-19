@@ -2,6 +2,7 @@
 
 #include <uui/views/view.h>
 #include <uui/views/viewgroup.h>
+#include <lib/strhashmap.h>
 
 static inline intn_t get_default_size(intn_t size, uui_measure_spec_t measure_spec) {
     intn_t result = size;
@@ -70,6 +71,44 @@ static void uui_view_invalidate(uui_view_t *view, uintn_t flags, uui_rect_t *rec
     }
 }
 
+static int value2length(uui_component_value_t *value, intn_t *plength) {
+    if (value->type==UUI_COMPONENT_VALUETYPE_IDENTIFIER) {
+        if (!AsciiStrCmp(value->u.str, "MATCH_PARENT"))
+            *plength = (intn_t)UUI_MATCH_PARENT;
+        else if (!AsciiStrCmp(value->u.str, "WRAP_CONTENT"))
+            *plength = (intn_t)UUI_WRAP_CONTENT;
+        else
+            return -1;
+    }
+    else if(value->type==UUI_COMPONENT_VALUETYPE_NUMBER) {
+        *plength = (intn_t)value->u.i64;
+    }
+    else return -1;
+
+    return 0;
+}
+
+static int uui_view_set_property(uui_view_t *view, const char *name, uui_component_value_t *value) {
+    if (!AsciiStrCmp(name, "layout_width")) {
+        return value2length(value, &view->layout_size.width);
+    }
+
+    else if (!AsciiStrCmp(name, "layout_height")) {
+        return value2length(value, &view->layout_size.height);
+    }
+
+    else if (!AsciiStrCmp(name, "id")) {
+        if (value->type==UUI_COMPONENT_VALUETYPE_STRING) {
+            view->id = AsciiStrDup(value->u.str);
+        }
+        else return -1;
+    }
+
+    else return -1;
+
+    return 0;
+}
+
 int uui_view_initialize(uui_view_t *view) {
     SetMem(view, sizeof(*view), 0);
     view->measure = uui_view_measure;
@@ -82,6 +121,8 @@ int uui_view_initialize(uui_view_t *view) {
     view->parent = NULL;
 
     view->layout_size = uui_size(UUI_WRAP_CONTENT, UUI_WRAP_CONTENT);
+    view->comp_layout_properties = strHashmapCreate(5);
+    view->comp_set_property = uui_view_set_property;
 
     return 0;
 }

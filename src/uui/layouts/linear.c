@@ -228,12 +228,75 @@ static uui_layoutparams_linear_t* uui_layout_linear_get_layoutparams(uui_layout_
     return NULL;
 }
 
+static int uui_view_comp_add_child_view(uui_view_t *view, uui_view_t *childview) {
+    uui_layout_linear_t* linear = containerof(view, uui_layout_linear_t, viewgroup.view);
+    uui_component_value_t *value;
+
+    linear->add_view(linear, childview);
+    uui_layoutparams_linear_t *lp = uui_layout_linear_get_layoutparams(linear, childview);
+
+    value = hashmapGet(childview->comp_layout_properties, "layout_weight");
+    if (value && value->type==UUI_COMPONENT_VALUETYPE_NUMBER) {
+        lp->weight = (uintn_t)value->u.i64;
+    }
+
+    value = hashmapGet(childview->comp_layout_properties, "layout_margin_top");
+    if (value && value->type==UUI_COMPONENT_VALUETYPE_NUMBER) {
+        lp->margin_top = (intn_t)value->u.i64;
+    }
+
+    value = hashmapGet(childview->comp_layout_properties, "layout_margin_right");
+    if (value && value->type==UUI_COMPONENT_VALUETYPE_NUMBER) {
+        lp->margin_right = (intn_t)value->u.i64;
+    }
+
+    value = hashmapGet(childview->comp_layout_properties, "layout_margin_bottom");
+    if (value && value->type==UUI_COMPONENT_VALUETYPE_NUMBER) {
+        lp->margin_bottom = (intn_t)value->u.i64;
+    }
+
+    value = hashmapGet(childview->comp_layout_properties, "layout_margin_left");
+    if (value && value->type==UUI_COMPONENT_VALUETYPE_NUMBER) {
+        lp->margin_left = (intn_t)value->u.i64;
+    }
+
+    return 0;
+}
+
+static int uui_layout_linear_set_property(uui_view_t *view, const char *name, uui_component_value_t *value) {
+    uui_layout_linear_t* linear = containerof(view, uui_layout_linear_t, viewgroup.view);
+    (void)(linear);
+
+    if (!AsciiStrCmp(name, "orientation")) {
+        if (value->type!=UUI_COMPONENT_VALUETYPE_IDENTIFIER)
+            return -1;
+
+        if (!AsciiStrCmp(value->u.str, "VERTICAL"))
+            linear->set_orientation(linear, UUI_LAYOUT_LINEAR_ORIENTATION_VERTICAL);
+        else if (!AsciiStrCmp(value->u.str, "HORIZONTAL"))
+            linear->set_orientation(linear, UUI_LAYOUT_LINEAR_ORIENTATION_HORIZONTAL);
+        else
+            return -1;
+    }
+
+    else if (linear->view_comp_set_property) {
+        return linear->view_comp_set_property(&linear->viewgroup.view, name, value);
+    }
+
+    else return -1;
+
+    return 0;
+}
+
 int uui_layout_linear_initialize(uui_layout_linear_t *linear) {
     SetMem(linear, sizeof(*linear), 0);
     uui_viewgroup_initialize(&linear->viewgroup);
     linear->view_layout = linear->viewgroup.view.layout;
+    linear->view_comp_set_property = linear->viewgroup.view.comp_set_property;
     linear->viewgroup.view.measure = uui_layout_linear_measure;
     linear->viewgroup.view.layout = uui_layout_linear_layout;
+    linear->viewgroup.view.comp_add_child_view = uui_view_comp_add_child_view;
+    linear->viewgroup.view.comp_set_property = uui_layout_linear_set_property;
 
     list_initialize(&linear->children_params);
     linear->set_orientation = uui_layout_linear_set_orientation;

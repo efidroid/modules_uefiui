@@ -1,0 +1,81 @@
+import layouts.LinearLayout
+import views.Rect
+import views.View
+//import views.Button
+//import views.Label
+
+LinearLayout {
+    orientation: HORIZONTAL
+    layout_width: MATCH_PARENT
+    layout_height: MATCH_PARENT
+
+    // STATUSBAR
+    LinearLayout {
+        orientation: VERTICAL
+        /*LinearLayout.*/layout_width: MATCH_PARENT
+        layout_height: 60
+
+        View {
+            layout_width: MATCH_PARENT
+        }
+
+        /*Label {
+            text: "EFIDroid"
+        }*/
+
+        Rect {
+            layout_width: 20
+            layout_height: MATCH_PARENT
+            color: 0xffffffff
+        }
+
+        View {
+            layout_width: MATCH_PARENT
+        }
+    }
+
+    // CONTENT
+    LinearLayout {
+        orientation: HORIZONTAL
+        layout_width: MATCH_PARENT
+        layout_height: MATCH_PARENT
+    }
+
+    // NAVBAR
+    LinearLayout {
+        layout_width: MATCH_PARENT
+        layout_height: WRAP_CONTENT
+
+        Rect {
+            layout_width: MATCH_PARENT
+            layout_height: 40
+            color: 0xffffffaa
+        }
+        Rect {
+            layout_width: MATCH_PARENT
+            layout_height: 40
+            color: 0xffffff00
+        }
+        Rect {
+            layout_width: MATCH_PARENT
+            layout_height: 40
+            layout_weight: 2
+            color: 0xff00ff00
+        }
+
+       /* Button {
+            icon: "urc://icons/menu.svg"
+            width: MATCH_PARENT
+        }
+
+        Button {
+            icon: "urc://icons/home.svg"
+            width: MATCH_PARENT
+        }
+
+        Button {
+            icon: "urc://icons/back.svg"
+            width: MATCH_PARENT
+        }*/
+    }
+}

@@ -9,6 +9,9 @@ typedef struct {
 
     uui_view_t view;
     uui_pixel_t color;
+
+    // private
+    uui_view_comp_set_property_t view_comp_set_property;
 } uui_view_rect_t;
 
 int uui_view_rect_initialize(uui_view_rect_t *rect);

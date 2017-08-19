@@ -1,11 +1,7 @@
 #include <uui_platform.h>
 
 #include <uui/canvas.h>
-#include <uui/views/view.h>
-#include <uui/views/viewgroup.h>
-#include <uui/views/rect.h>
-#include <uui/layouts/linear.h>
-#include <uui/layouts/absolute.h>
+#include <uui/components.h>
 
 typedef struct {
     uui_fb_t *fb;
@@ -25,9 +21,7 @@ static void fb_flush(context_t *context) {
     }
 }
 
-uui_view_rect_t *g_touch_rect = NULL;
-
-int maintest(int width, int height) {
+int maintest(uui_comp_context_t *ccontext, int width, int height) {
     int rc;
     context_t *context = AllocateZeroPool(sizeof(context_t));
 
@@ -35,155 +29,15 @@ int maintest(int width, int height) {
     context->fb = uui_fb_alloc(width, height);
     context->fbcanvas = uui_canvas_framebuffer_create(context->fb);
 
-    uui_layout_absolute_t *absolute = uui_layout_absolute_create();
-    absolute->viewgroup.view.id = "rootview";
-    context->rootview = &absolute->viewgroup.view;
+    // load main component
+    uui_component_t *comp = uui_component_load(ccontext, "app.Main");
+    ASSERT(comp);
+    ASSERT(comp->allocate_view);
 
-    if(1){
-    // add rect
-    uui_view_rect_t *rect = uui_view_rect_create();
-    rect->color = uui_pixel(0, 0, 0, 0);
-    rect->view.layout_size = uui_size(UUI_MATCH_PARENT, UUI_MATCH_PARENT);
-    rect->view.id = "background";
-    absolute->add_view(absolute, &rect->view, uui_point(0, 0));
-    }
-
-    uui_layout_linear_t *linear = uui_layout_linear_create();
-    linear->viewgroup.view.layout_size = uui_size(UUI_WRAP_CONTENT, UUI_MATCH_PARENT);
-    linear->set_orientation(linear, UUI_LAYOUT_LINEAR_ORIENTATION_HORIZONTAL);
-    linear->viewgroup.view.id = "mainlayout";
-    absolute->add_view(absolute, &linear->viewgroup.view, uui_point(0, 0));
-
-    uui_layout_linear_t *linear2 = uui_layout_linear_create();
-    linear2->set_orientation(linear2, UUI_LAYOUT_LINEAR_ORIENTATION_VERTICAL);
-    linear2->viewgroup.view.layout_size = uui_size(UUI_MATCH_PARENT, UUI_WRAP_CONTENT);
-    linear2->viewgroup.view.id = "header";
-    linear->add_view(linear, &linear2->viewgroup.view);
-
-    {
-    // add rect
-    uui_view_rect_t *rect = uui_view_rect_create();
-    rect->color = uui_pixel(0, 0, 255, 0);
-    rect->view.layout_size = uui_size(50, 50);
-    rect->view.id = "h1";
-    linear2->add_view(linear2, &rect->view);
-    uui_layoutparams_linear_t *lp = linear2->get_layoutparams(linear2, &rect->view);
-    lp->margin_left = 5;
-    lp->margin_top = 5;
-    //lp->margin_right = 5;
-    lp->margin_bottom = 5;
-    }
-
-    {
-    // add rect
-    uui_view_rect_t *rect = uui_view_rect_create();
-    rect->color = uui_pixel(0, 255, 255, 0);
-    rect->view.layout_size = uui_size(50, 50);
-    rect->view.id = "h2";
-    linear2->add_view(linear2, &rect->view);
-    uui_layoutparams_linear_t *lp = linear2->get_layoutparams(linear2, &rect->view);
-    lp->margin_left = 5;
-    lp->margin_top = 5;
-    //lp->margin_right = 5;
-    lp->margin_bottom = 5;
-    }
-
-    {
-    // add rect
-    uui_view_rect_t *rect = uui_view_rect_create();
-    rect->color = uui_pixel(255, 0, 255, 0);
-    rect->view.layout_size = uui_size(UUI_MATCH_PARENT, 50);
-    rect->view.id = "h3";
-    linear2->add_view(linear2, &rect->view);
-    uui_layoutparams_linear_t *lp = linear2->get_layoutparams(linear2, &rect->view);
-    lp->margin_left = 5;
-    lp->margin_top = 5;
-    //lp->margin_right = 5;
-    lp->margin_bottom = 5;
-    }
-
-    {
-    // add rect
-    uui_view_rect_t *rect = uui_view_rect_create();
-    rect->color = uui_pixel(0, 255, 255, 0);
-    rect->view.layout_size = uui_size(50, 50);
-    rect->view.id = "h4";
-    linear2->add_view(linear2, &rect->view);
-    uui_layoutparams_linear_t *lp = linear2->get_layoutparams(linear2, &rect->view);
-    lp->margin_left = 5;
-    lp->margin_top = 5;
-    lp->margin_right = 5;
-    lp->margin_bottom = 5;
-    }
-
-    {
-    // add rect
-    uui_view_rect_t *rect = uui_view_rect_create();
-    rect->color = uui_pixel(0, 255, 0, 0);
-    rect->view.layout_size = uui_size(UUI_MATCH_PARENT, UUI_MATCH_PARENT);
-    rect->view.id = "c1";
-    linear->add_view(linear, &rect->view);
-    }
-
-    {
-    // add rect
-    uui_view_rect_t *rect = uui_view_rect_create();
-    rect->color = uui_pixel(255, 0, 0, 0);
-    rect->view.layout_size = uui_size(10, 10);
-    rect->view.id = "c2";
-    linear->add_view(linear, &rect->view);
-    }
-
-    uui_view_rect_t *rect_c3 = NULL;
-    {
-    // add rect
-    uui_view_rect_t *rect = uui_view_rect_create();
-    rect_c3 = rect;
-    rect->color = uui_pixel(255, 255, 0, 0);
-    rect->view.layout_size = uui_size(UUI_MATCH_PARENT, UUI_MATCH_PARENT);
-    rect->view.id = "c3";
-    linear->add_view(linear, &rect->view);
-    uui_layoutparams_linear_t *lp = linear->get_layoutparams(linear, &rect->view);
-    lp->weight = 3;
-    lp->margin_left = 10;
-    lp->margin_top = 10;
-    lp->margin_right = 10;
-    lp->margin_bottom = 10;
-    }
-
-    uui_layout_linear_t *linear3 = uui_layout_linear_create();
-    linear3->set_orientation(linear3, UUI_LAYOUT_LINEAR_ORIENTATION_VERTICAL);
-    linear3->viewgroup.view.layout_size = uui_size(UUI_MATCH_PARENT, 50);
-    linear3->viewgroup.view.id = "footer";
-    linear->add_view(linear, &linear3->viewgroup.view);
-
-    {
-    // add rect
-    uui_view_rect_t *rect = uui_view_rect_create();
-    rect->color = uui_pixel(255, 255, 255, 0);
-    rect->view.layout_size = uui_size(50, 50);
-    rect->view.id = "f1";
-    linear3->add_view(linear3, &rect->view);
-    }
-
-    {
-    // add rect
-    uui_view_rect_t *rect = uui_view_rect_create();
-    rect->color = uui_pixel(128, 255, 0, 0);
-    rect->view.layout_size = uui_size(UUI_MATCH_PARENT, UUI_MATCH_PARENT);
-    rect->view.id = "f2";
-    linear3->add_view(linear3, &rect->view);
-    }
-
-    uui_view_rect_t *rect = uui_view_rect_create();
-    rect->color = uui_pixel(128, 128, 128, 0);
-    rect->view.layout_size = uui_size(UUI_MATCH_PARENT, 10);
-    rect->view.id = "animated";
-    absolute->add_view(absolute, &rect->view, uui_point(0, 0));
-    uui_layoutparams_absolute_t *lp_debugrect = absolute->get_layoutparams(absolute, &rect->view);
+    context->rootview = comp->allocate_view(comp);
+    ASSERT(context->rootview);
 
     uui_canvas_boundary_t boundary = {.offset = uui_point(0, 0), .size = uui_size(0, 0)};
-    int dir = 1;
     for(;;) {
         hw_mainloop_cb();
 
@@ -216,34 +70,9 @@ int maintest(int width, int height) {
             context->rootview->invalid_region = uui_rect(uui_point(0, 0), uui_size(0, 0));
         }
 
-#if 1
-        if(dir)
-            lp_debugrect->position.y+=1;
-        else
-            lp_debugrect->position.y-=1;
-
-        if (lp_debugrect->position.y >= context->fb->size.height)
-            dir = 0;
-        else if (lp_debugrect->position.y <=0)
-            dir = 1;
-
-        rect->view.invalidate(&rect->view, UUI_INVALID_LAYOUT, NULL);
-#else
-        (void)(lp_debugrect);
-        (void)(dir);
-#endif
-
-#if 1
-        uui_rect_t ir = uui_rect(rect_c3->view.computed_position, rect_c3->view.computed_size);
-        rect_c3->view.invalidate(&rect_c3->view, UUI_INVALID_DRAW, &ir);
-#else
-        (void)(rect_c3);
-#endif
-
         // flush
         fb_flush(context);
         rc = 0;
-        //break;
     }
 
     return rc;

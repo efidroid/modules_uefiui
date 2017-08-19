@@ -3,6 +3,8 @@
 
 #include <uui/common.h>
 #include <uui/canvas.h>
+#include <lib/hashmap.h>
+#include <uui/components.h>
 
 #define UUI_INTN_MAX ((intn_t)(((uintn_t)-1)/2))
 #define UUI_MATCH_PARENT (UUI_INTN_MAX - 0)
@@ -24,6 +26,7 @@ typedef struct {
 } uui_measure_spec_t;
 
 struct uui_viewgroup;
+struct uui_component_value;
 
 typedef struct uui_view uui_view_t;
 
@@ -31,6 +34,9 @@ typedef void (*uui_view_measure_t)(uui_view_t *view, uui_measure_spec_t measure_
 typedef void (*uui_view_layout_t)(uui_view_t *view, uui_point_t position, uui_size_t size);
 typedef void (*uui_view_draw_t)(uui_view_t *view, uui_canvas_t *canvas);
 typedef void (*uui_view_invalidate_t)(uui_view_t *view, uintn_t flags, uui_rect_t *rect);
+
+typedef int (*uui_view_comp_set_property_t)(uui_view_t *view, const char *name, struct uui_component_value *value);
+typedef int (*uui_view_comp_add_child_view_t)(uui_view_t *view, uui_view_t *childview);
 
 struct uui_view {
     int allocated;
@@ -57,6 +63,11 @@ struct uui_view {
     uui_view_layout_t layout;
     uui_view_draw_t draw;
     uui_view_invalidate_t invalidate;
+
+    // components
+    Hashmap *comp_layout_properties;
+    uui_view_comp_set_property_t comp_set_property;
+    uui_view_comp_add_child_view_t comp_add_child_view;
 };
 
 int uui_view_initialize(uui_view_t *view);
