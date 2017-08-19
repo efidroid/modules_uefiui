@@ -148,6 +148,13 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
         }
     }
 
+    if (view->layout_size.width==UUI_MATCH_PARENT) {
+        view->measured_size.width = measure_spec_width.size;
+    }
+    if (view->layout_size.height==UUI_MATCH_PARENT) {
+        view->measured_size.height = measure_spec_height.size;
+    }
+
     uui_resolve_size_and_state(&view->measured_size.width, &view->measured_state[0], measure_spec_width);
     uui_resolve_size_and_state(&view->measured_size.height, &view->measured_state[1], measure_spec_height);
 }
