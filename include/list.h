@@ -45,7 +45,7 @@ static inline void list_clear_node(struct list_node *item)
     item->prev = item->next = 0;
 }
 
-static inline BOOLEAN list_in_list(struct list_node *item)
+static inline bool_t list_in_list(struct list_node *item)
 {
     if (item->prev == 0 && item->next == 0)
         return FALSE;
@@ -261,7 +261,7 @@ static inline struct list_node *list_next_wrap(struct list_node *list, struct li
         &(entry)->member != (list);\
         entry = temp_entry, temp_entry = containerof((temp_entry)->member.next, type, member))
 
-static inline BOOLEAN list_is_empty(struct list_node *list)
+static inline bool_t list_is_empty(struct list_node *list)
 {
     return (list->next == list) ? TRUE : FALSE;
 }

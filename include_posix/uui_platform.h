@@ -23,7 +23,7 @@ typedef uintptr_t uintn_t;
 
 #define TRUE true
 #define FALSE false
-#define BOOLEAN bool
+typedef bool bool_t;
 
 #define OFFSET_OF offsetof
 
