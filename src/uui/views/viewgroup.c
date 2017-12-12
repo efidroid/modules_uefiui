@@ -1,15 +1,13 @@
-#include <uui_platform.h>
-
 #include <uui/views/viewgroup.h>
 
 static void uui_view_viewgroup_draw(uui_view_t *view, uui_canvas_t *canvas) {
-    uui_viewgroup_t* viewgroup = containerof(view, uui_viewgroup_t, view);
+    uui_viewgroup_t* viewgroup = CONTAINER_OF(view, uui_viewgroup_t, view);
 
     uui_canvas_boundary_t boundary = {.offset = uui_point(0, 0), .size = uui_size(0, 0)};
     canvas->boundary_push(canvas, &boundary, 0);
 
     uui_view_t *childview;
-    list_for_every_entry(&viewgroup->children, childview, uui_view_t, node) {
+    uui_list_for_every_entry(&viewgroup->children, childview, uui_view_t, node) {
         boundary.offset = childview->computed_position;
         boundary.size = childview->computed_size;
         canvas->boundary_update(canvas);
@@ -45,7 +43,7 @@ static void uui_view_viewgroup_draw(uui_view_t *view, uui_canvas_t *canvas) {
 }
 
 static void uui_viewgroup_internal_add_view(uui_viewgroup_t *viewgroup, uui_view_t *view) {
-    list_add_tail(&viewgroup->children, &view->node);
+    uui_list_add_tail(&viewgroup->children, &view->node);
     view->parent = viewgroup;
 }
 
@@ -55,7 +53,7 @@ int uui_viewgroup_initialize(uui_viewgroup_t *viewgroup) {
     uui_view_initialize(&viewgroup->view);
     viewgroup->view.draw = uui_view_viewgroup_draw;
 
-    list_initialize(&viewgroup->children);
+    uui_list_initialize(&viewgroup->children);
     viewgroup->internal_add_view = uui_viewgroup_internal_add_view;
 
     return 0;

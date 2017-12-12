@@ -1,4 +1,4 @@
-#include <common.h>
+#include <uui/common.h>
 #include <uui/resources.h>
 
 typedef struct {
@@ -16,7 +16,7 @@ typedef struct {
 } urc_file_container_t;
 
 static int urc_file_container_read(urc_file_t *file, void *buf, size_t *psize) {
-    urc_file_container_t* ifile = containerof(file, urc_file_container_t, file);
+    urc_file_container_t* ifile = CONTAINER_OF(file, urc_file_container_t, file);
     ASSERT(ifile->position <= ifile->datasize);
 
     if (!psize)
@@ -34,7 +34,7 @@ static int urc_file_container_read(urc_file_t *file, void *buf, size_t *psize) {
 }
 
 static int urc_file_container_seek(urc_file_t *file, size_t *poffset, int whence) {
-    urc_file_container_t* ifile = containerof(file, urc_file_container_t, file);
+    urc_file_container_t* ifile = CONTAINER_OF(file, urc_file_container_t, file);
 
     if (!poffset)
         return -1;
@@ -72,7 +72,7 @@ static int urc_file_container_seek(urc_file_t *file, size_t *poffset, int whence
 }
 
 static int urc_file_container_close(urc_file_t *file) {
-    urc_file_container_t* ifile = containerof(file, urc_file_container_t, file);
+    urc_file_container_t* ifile = CONTAINER_OF(file, urc_file_container_t, file);
 
     FreePool(ifile);
 
@@ -82,7 +82,7 @@ static int urc_file_container_close(urc_file_t *file) {
 static int urc_source_container_open(urc_source_t *source, const char *path, urc_file_t **pfile) {
     uint32_t i;
     uint32_t num_files;
-    urc_source_container_t* isource = containerof(source, urc_source_container_t, source);
+    urc_source_container_t* isource = CONTAINER_OF(source, urc_source_container_t, source);
     uint8_t *data = isource->data;
 
     if (CompareMem(data, "URCC", 4))
@@ -130,7 +130,7 @@ static int urc_source_container_open(urc_source_t *source, const char *path, urc
 }
 
 static int urc_context_register_source(urc_context_t *context, urc_source_t *source) {
-    list_add_tail(&context->sources, &source->node);
+    uui_list_add_tail(&context->sources, &source->node);
     return 0;
 }
 
@@ -149,7 +149,7 @@ static int urc_context_open(urc_context_t *context, const char *path, urc_file_t
     int rc;
     urc_file_t *file;
 
-    list_for_every_entry(&context->sources, source, urc_source_t, node) {
+    uui_list_for_every_entry(&context->sources, source, urc_source_t, node) {
         file = NULL;
         rc = source->open(source, path, &file);
         if (rc==0 && file) {
@@ -165,7 +165,7 @@ urc_context_t* urc_context_create(void) {
     urc_context_t *context = AllocateZeroPool(sizeof(urc_context_t));
     if (!context) return NULL;
 
-    list_initialize(&context->sources);
+    uui_list_initialize(&context->sources);
     context->register_source = urc_context_register_source;
     context->register_source_container = urc_context_register_source_container;
     context->open = urc_context_open;

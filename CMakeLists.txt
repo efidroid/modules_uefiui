@@ -12,6 +12,7 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -Wshadow -Wstrict-prototypes")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections -Wl,-gc-sections -Os -ggdb -fno-builtin")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-unused-parameter")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fvisibility=hidden")
 
 include_directories(
     include
@@ -26,10 +27,7 @@ BISON_TARGET(uui_parser src/uui.y   ${CMAKE_CURRENT_BINARY_DIR}/uui_parser.c)
 FLEX_TARGET(uui_lexer   src/uui.lex ${CMAKE_CURRENT_BINARY_DIR}/uui_lexer.c DEFINES_FILE ${CMAKE_CURRENT_BINARY_DIR}/uui_lexer.h)
 ADD_FLEX_BISON_DEPENDENCY(uui_lexer uui_parser)
 
-add_executable(main
-    src/main.c
-
-    src/maintest.c
+add_library(uui
     src/uui/fb.c
     src/uui/canvas.c
     src/uui/components.c
@@ -47,4 +45,10 @@ add_executable(main
     ${BISON_uui_parser_OUTPUTS}
     ${FLEX_uui_lexer_OUTPUTS}
 )
-target_link_libraries(main SDL)
+target_link_libraries(uui SDL)
+
+add_executable(main
+    src/main.c
+    src/maintest.c
+)
+target_link_libraries(main uui)

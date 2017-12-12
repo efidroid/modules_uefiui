@@ -10,13 +10,17 @@ typedef struct {
     uint8_t reserved;
 } uui_pixel_t;
 
-typedef struct {
+typedef struct uui_fb uui_fb_t;
+
+typedef void (*uui_fb_flush)(void);
+
+struct uui_fb {
     uui_pixel_t *pixels;
     uui_size_t size;
 
     uui_point_t dirtyregion_start;
     uui_point_t dirtyregion_end;
-} uui_fb_t;
+};
 
 static inline uui_pixel_t uui_pixel(uint8_t blue, uint8_t green, uint8_t red, uint8_t reserved) {
     return (uui_pixel_t) {blue, green, red, reserved};

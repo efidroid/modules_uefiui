@@ -1,8 +1,6 @@
-#include <uui_platform.h>
-
 #include <uui/views/view.h>
 #include <uui/views/viewgroup.h>
-#include <lib/strhashmap.h>
+#include <Library/StrHashmap.h>
 
 static inline intn_t get_default_size(intn_t size, uui_measure_spec_t measure_spec) {
     intn_t result = size;
@@ -121,7 +119,7 @@ int uui_view_initialize(uui_view_t *view) {
     view->parent = NULL;
 
     view->layout_size = uui_size(UUI_WRAP_CONTENT, UUI_WRAP_CONTENT);
-    view->comp_layout_properties = strHashmapCreate(5);
+    view->comp_layout_properties = StrHashmapCreate(5);
     view->comp_set_property = uui_view_set_property;
 
     return 0;

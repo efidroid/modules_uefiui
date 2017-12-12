@@ -1,5 +1,3 @@
-#include <uui_platform.h>
-
 #include <uui/canvas.h>
 
 static void uui_canvas_draw_rect(uui_canvas_t *canvas, uui_point_t dst, uui_size_t size) {
@@ -54,7 +52,7 @@ static inline void uui_canvas_boundary_update_internal(uui_canvas_t *canvas) {
     canvas->size = canvas->fb->size;
 
     uui_canvas_boundary_t *boundary;
-    list_for_every_entry(&canvas->boundary_stack, boundary, uui_canvas_boundary_t, node) {
+    uui_list_for_every_entry(&canvas->boundary_stack, boundary, uui_canvas_boundary_t, node) {
         canvas->size.width = MIN(canvas->size.width - boundary->offset.x, boundary->size.width);
         canvas->size.height = MIN(canvas->size.height - boundary->offset.y, boundary->size.height);
 
@@ -64,7 +62,7 @@ static inline void uui_canvas_boundary_update_internal(uui_canvas_t *canvas) {
 }
 
 static void uui_canvas_boundary_push(uui_canvas_t *canvas, uui_canvas_boundary_t *boundary, uintn_t update) {
-    list_add_tail(&canvas->boundary_stack, &boundary->node);
+    uui_list_add_tail(&canvas->boundary_stack, &boundary->node);
     if (update)
         uui_canvas_boundary_update_internal(canvas);
 }
@@ -74,7 +72,7 @@ static void uui_canvas_boundary_update(uui_canvas_t *canvas) {
 }
 
 static uui_canvas_boundary_t* uui_canvas_boundary_pop(uui_canvas_t *canvas, uintn_t update) {
-    uui_canvas_boundary_t *boundary = list_remove_tail_type(&canvas->boundary_stack, uui_canvas_boundary_t, node);
+    uui_canvas_boundary_t *boundary = uui_list_remove_tail_type(&canvas->boundary_stack, uui_canvas_boundary_t, node);
     if (update)
         uui_canvas_boundary_update_internal(canvas);
     return boundary;
@@ -147,7 +145,7 @@ void uui_canvas_copy(uui_canvas_t *canvas_dst, uui_canvas_t *canvas_src, uui_poi
 int uui_canvas_framebuffer_initialize(uui_canvas_t *canvas, uui_fb_t *fb) {
     SetMem(canvas, sizeof(*canvas), 0);
 
-    list_initialize(&canvas->boundary_stack);
+    uui_list_initialize(&canvas->boundary_stack);
     canvas->fb = fb;
     canvas->size.width = fb->size.width;
     canvas->size.height = fb->size.height;

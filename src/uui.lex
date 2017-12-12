@@ -1,5 +1,5 @@
 %{
-#include <common.h>
+#include <uui/common.h>
 #include <uui/components.h>
 #include "uui_parser.h"
 

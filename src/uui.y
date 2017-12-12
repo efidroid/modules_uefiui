@@ -1,7 +1,7 @@
 %{
-#include <common.h>
+#include <uui/common.h>
 #include <uui/components.h>
-#include <lib/strhashmap.h>
+#include <Library/StrHashmap.h>
 
 #include "uui_parser.h"
 #include "uui_lexer.h"
@@ -90,7 +90,7 @@ members : { $$ = NULL; }
         | object members {
             $$ = $2;
             uui_object_tryinit(&$$);
-            list_add_head(&$$->children, &$1->node);
+            uui_list_add_head(&$$->children, &$1->node);
           }
         | id_or_idchain COLON value delimiter members {
             $$ = $5;
@@ -105,32 +105,38 @@ members : { $$ = NULL; }
         ;
 
 value   : STRING {
-              $$ = yyalloc(sizeof(uui_component_valuetype_t), scanner);
+              $$ = yyalloc(sizeof(uui_component_value_t), scanner);
+              ASSERT($$);
               $$->type = UUI_COMPONENT_VALUETYPE_STRING;
               $$->u.str = yylval.str;
           }
         | NUMBER {
-              $$ = yyalloc(sizeof(uui_component_valuetype_t), scanner);
+              $$ = yyalloc(sizeof(uui_component_value_t), scanner);
+              ASSERT($$);
               $$->type = UUI_COMPONENT_VALUETYPE_NUMBER;
               $$->u.i64 = yylval.i64;
           }
         | FP_NUMBER {
-              $$ = yyalloc(sizeof(uui_component_valuetype_t), scanner);
+              $$ = yyalloc(sizeof(uui_component_value_t), scanner);
+              ASSERT($$);
               $$->type = UUI_COMPONENT_VALUETYPE_FP_NUMBER;
               $$->u.fp = yylval.fp;
           }
         | TK_TRUE  {
-              $$ = yyalloc(sizeof(uui_component_valuetype_t), scanner);
+              $$ = yyalloc(sizeof(uui_component_value_t), scanner);
+              ASSERT($$);
               $$->type = UUI_COMPONENT_VALUETYPE_BOOLEAN;
               $$->u.boolean = TRUE;
           }
         | TK_FALSE {
-              $$ = yyalloc(sizeof(uui_component_valuetype_t), scanner);
+              $$ = yyalloc(sizeof(uui_component_value_t), scanner);
+              ASSERT($$);
               $$->type = UUI_COMPONENT_VALUETYPE_BOOLEAN;
               $$->u.boolean = FALSE;
           }
         | IDENTIFIER {
-              $$ = yyalloc(sizeof(uui_component_valuetype_t), scanner);
+              $$ = yyalloc(sizeof(uui_component_value_t), scanner);
+              ASSERT($$);
               $$->type = UUI_COMPONENT_VALUETYPE_IDENTIFIER;
               $$->u.str = yylval.str;
           }
@@ -141,8 +147,8 @@ static void uui_object_tryinit(uui_component_parsed_t** pobj) {
     if ((*pobj) == NULL) {
         uui_component_parsed_t *obj = AllocateZeroPool(sizeof(uui_component_parsed_t));
         obj->typestr = NULL;
-        list_initialize(&obj->children);
-        obj->default_properties = strHashmapCreate(5);
+        uui_list_initialize(&obj->children);
+        obj->default_properties = StrHashmapCreate(5);
         *pobj = obj;
     }
 }
@@ -155,7 +161,7 @@ uui_component_parsed_t * uui_comp_internal_parse_component(uui_comp_context_t *c
         return NULL;
 
     parsed_component = NULL;
-    imports = strHashmapCreate(5);
+    imports = StrHashmapCreate(5);
     fileoffset = 0;
     linestart = 0;
 

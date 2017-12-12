@@ -1,11 +1,11 @@
-#include <common.h>
+#include <uui/common.h>
 #include <uui/components.h>
 #include <uui/views/rect.h>
 #include <uui/layouts/linear.h>
-#include <lib/strhashmap.h>
+#include <Library/StrHashmap.h>
 
 typedef struct {
-    listnode_t node;
+    uui_listnode_t node;
     char *path;
 } path_item_t;
 
@@ -32,8 +32,8 @@ uui_comp_context_t* uui_comp_create_context(void) {
     uui_comp_context_t *context = AllocateZeroPool(sizeof(uui_comp_context_t));
     if (!context) return NULL;
 
-    list_initialize(&context->paths);
-    context->components = strHashmapCreate(5);
+    uui_list_initialize(&context->paths);
+    context->components = StrHashmapCreate(5);
     ASSERT(context->components);
     context->urc = urc_context_create();
     ASSERT(context->urc);
@@ -62,7 +62,7 @@ int uui_comp_add_path(uui_comp_context_t *context, const char *path) {
         return -1;
 
     item->path = AsciiStrDup(path);
-    list_add_tail(&context->paths, &item->node);
+    uui_list_add_tail(&context->paths, &item->node);
 
     return 0;
 }
@@ -133,7 +133,7 @@ static bool_t comp_setprop(void *_key, void *_value, void *_context) {
 }
 
 static uui_view_t* uui_component_parsed_allocate_view(uui_component_t *_component) {
-    uui_component_parsed_t* component = containerof(_component, uui_component_parsed_t, component);
+    uui_component_parsed_t* component = CONTAINER_OF(_component, uui_component_parsed_t, component);
 
     ASSERT(component->parent_component);
     ASSERT(component->parent_component->allocate_view);
@@ -146,7 +146,7 @@ static uui_view_t* uui_component_parsed_allocate_view(uui_component_t *_componen
 
     if (view->comp_add_child_view) {
         uui_component_parsed_t *child;
-        list_for_every_entry(&component->children, child, uui_component_parsed_t, node) {
+        uui_list_for_every_entry(&component->children, child, uui_component_parsed_t, node) {
             uui_view_t *childview = child->component.allocate_view(&child->component);
             ASSERT(childview);
             view->comp_add_child_view(view, childview);
@@ -172,7 +172,7 @@ static void fill_parent_components(uui_comp_context_t *context, Hashmap *imports
     comp->parent_component = parent;
 
     uui_component_parsed_t *child;
-    list_for_every_entry(&comp->children, child, uui_component_parsed_t, node) {
+    uui_list_for_every_entry(&comp->children, child, uui_component_parsed_t, node) {
         fill_parent_components(context, imports, child);
     }
 }
@@ -184,7 +184,7 @@ uui_component_t* uui_component_load(uui_comp_context_t *context, const char *id)
     Hashmap *imports = NULL;
 
     path_item_t *item;
-    list_for_every_entry(&context->paths, item, path_item_t, node) {
+    uui_list_for_every_entry(&context->paths, item, path_item_t, node) {
         // get filename
         rc = component_name_to_filename(item->path, pathbuf, id);
         if (rc) continue;
@@ -221,8 +221,8 @@ static bool_t remove_component(void *key, void *value, void *_context) {
 }
 
 void uui_comp_free_context(uui_comp_context_t *context) {
-    while (!list_is_empty(&context->paths)) {
-        path_item_t *item = list_remove_tail_type(&context->paths, path_item_t, node);
+    while (!uui_list_is_empty(&context->paths)) {
+        path_item_t *item = uui_list_remove_tail_type(&context->paths, path_item_t, node);
 
         FreePool(item->path);
         FreePool(item);

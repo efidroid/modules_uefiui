@@ -1,5 +1,3 @@
-#include <uui_platform.h>
-
 #include <uui/fb.h>
 
 uui_fb_t *uui_fb_alloc(intn_t width, intn_t height) {

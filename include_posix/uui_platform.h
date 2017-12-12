@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <stdio.h>
 
 typedef intptr_t intn_t;
 typedef uintptr_t uintn_t;

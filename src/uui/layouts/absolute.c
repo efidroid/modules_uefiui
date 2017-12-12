@@ -72,12 +72,12 @@ static uui_measure_spec_t get_child_measure_spec(uui_measure_spec_t spec, intn_t
 }
 
 static void uui_layout_absolute_measure(uui_view_t *view, uui_measure_spec_t measure_spec_width, uui_measure_spec_t measure_spec_height) {
-    uui_layout_absolute_t* absolute = containerof(view, uui_layout_absolute_t, viewgroup.view);
+    uui_layout_absolute_t* absolute = CONTAINER_OF(view, uui_layout_absolute_t, viewgroup.view);
     uui_size_t size = uui_size(0, 0);
 
     uui_view_t *childview;
     uui_layoutparams_absolute_t *lp;
-    list_for_every_entry(&absolute->children_params, lp, uui_layoutparams_absolute_t, node) {
+    uui_list_for_every_entry(&absolute->children_params, lp, uui_layoutparams_absolute_t, node) {
         childview = lp->view;
 
         if (childview->measure && (childview->invalid_flags & UUI_INVALID_MEASURE)) {
@@ -100,11 +100,11 @@ static void uui_layout_absolute_measure(uui_view_t *view, uui_measure_spec_t mea
 }
 
 static void uui_layout_absolute_layout(uui_view_t *view, uui_point_t position, uui_size_t size) {
-    uui_layout_absolute_t* absolute = containerof(view, uui_layout_absolute_t, viewgroup.view);
+    uui_layout_absolute_t* absolute = CONTAINER_OF(view, uui_layout_absolute_t, viewgroup.view);
 
     uui_view_t *childview;
     uui_layoutparams_absolute_t *lp;
-    list_for_every_entry(&absolute->children_params, lp, uui_layoutparams_absolute_t, node) {
+    uui_list_for_every_entry(&absolute->children_params, lp, uui_layoutparams_absolute_t, node) {
         childview = lp->view;
 
         if (childview->layout && (childview->invalid_flags & UUI_INVALID_LAYOUT)) {
@@ -121,7 +121,7 @@ static void uui_layout_absolute_add_view(uui_layout_absolute_t *absolute, uui_vi
     if (!lp) return;
 
     lp->view = view;
-    list_add_tail(&absolute->children_params, &lp->node);
+    uui_list_add_tail(&absolute->children_params, &lp->node);
     lp->position = position;
 
     absolute->viewgroup.internal_add_view(&absolute->viewgroup, view);
@@ -129,7 +129,7 @@ static void uui_layout_absolute_add_view(uui_layout_absolute_t *absolute, uui_vi
 
 static uui_layoutparams_absolute_t* uui_layout_absolute_get_layoutparams(uui_layout_absolute_t *absolute, uui_view_t *view) {
     uui_layoutparams_absolute_t *lp;
-    list_for_every_entry(&absolute->children_params, lp, uui_layoutparams_absolute_t, node) {
+    uui_list_for_every_entry(&absolute->children_params, lp, uui_layoutparams_absolute_t, node) {
         if (lp->view == view)
             return lp;
     }
@@ -143,7 +143,7 @@ int uui_layout_absolute_initialize(uui_layout_absolute_t *absolute) {
     absolute->viewgroup.view.measure = uui_layout_absolute_measure;
     absolute->viewgroup.view.layout = uui_layout_absolute_layout;
 
-    list_initialize(&absolute->children_params);
+    uui_list_initialize(&absolute->children_params);
     absolute->add_view = uui_layout_absolute_add_view;
     absolute->get_layoutparams = uui_layout_absolute_get_layoutparams;
 

@@ -23,7 +23,7 @@ static inline uui_measure_spec_t get_child_spec(intn_t size, intn_t margin, uui_
 }
 
 static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measure_spec_width, uui_measure_spec_t measure_spec_height) {
-    uui_layout_linear_t* linear = containerof(view, uui_layout_linear_t, viewgroup.view);
+    uui_layout_linear_t* linear = CONTAINER_OF(view, uui_layout_linear_t, viewgroup.view);
     uui_view_t *childview;
     uui_layoutparams_linear_t *lp;
 
@@ -35,7 +35,7 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
     view->measured_state[0] = 0;
     view->measured_state[1] = 0;
 
-    list_for_every_entry(&linear->children_params, lp, uui_layoutparams_linear_t, node) {
+    uui_list_for_every_entry(&linear->children_params, lp, uui_layoutparams_linear_t, node) {
         childview = lp->view;
 
         uui_size_t layout_size = childview->layout_size;
@@ -85,7 +85,7 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
         }
 
         uintn_t i = 0;
-        list_for_every_entry(&linear->children_params, lp, uui_layoutparams_linear_t, node) {
+        uui_list_for_every_entry(&linear->children_params, lp, uui_layoutparams_linear_t, node) {
             childview = lp->view;
 
             // get layout size
@@ -160,12 +160,12 @@ static void uui_layout_linear_measure(uui_view_t *view, uui_measure_spec_t measu
 }
 
 static void uui_layout_linear_layout(uui_view_t *view, uui_point_t position, uui_size_t size) {
-    uui_layout_linear_t* linear = containerof(view, uui_layout_linear_t, viewgroup.view);
+    uui_layout_linear_t* linear = CONTAINER_OF(view, uui_layout_linear_t, viewgroup.view);
     uui_point_t pos = uui_point(0, 0);
 
     uui_view_t *childview;
     uui_layoutparams_linear_t *lp;
-    list_for_every_entry(&linear->children_params, lp, uui_layoutparams_linear_t, node) {
+    uui_list_for_every_entry(&linear->children_params, lp, uui_layoutparams_linear_t, node) {
         childview = lp->view;
 
         if (childview->layout && (childview->invalid_flags & UUI_INVALID_LAYOUT)) {
@@ -209,7 +209,7 @@ static void uui_layout_linear_add_view(uui_layout_linear_t *linear, uui_view_t *
     if (!lp) return;
 
     lp->view = view;
-    list_add_tail(&linear->children_params, &lp->node);
+    uui_list_add_tail(&linear->children_params, &lp->node);
     lp->weight = 1;
     lp->margin_left = 0;
     lp->margin_top = 0;
@@ -221,7 +221,7 @@ static void uui_layout_linear_add_view(uui_layout_linear_t *linear, uui_view_t *
 
 static uui_layoutparams_linear_t* uui_layout_linear_get_layoutparams(uui_layout_linear_t *linear, uui_view_t *view){
     uui_layoutparams_linear_t *lp;
-    list_for_every_entry(&linear->children_params, lp, uui_layoutparams_linear_t, node) {
+    uui_list_for_every_entry(&linear->children_params, lp, uui_layoutparams_linear_t, node) {
         if (lp->view == view)
             return lp;
     }
@@ -229,7 +229,7 @@ static uui_layoutparams_linear_t* uui_layout_linear_get_layoutparams(uui_layout_
 }
 
 static int uui_view_comp_add_child_view(uui_view_t *view, uui_view_t *childview) {
-    uui_layout_linear_t* linear = containerof(view, uui_layout_linear_t, viewgroup.view);
+    uui_layout_linear_t* linear = CONTAINER_OF(view, uui_layout_linear_t, viewgroup.view);
     uui_component_value_t *value;
 
     linear->add_view(linear, childview);
@@ -264,7 +264,7 @@ static int uui_view_comp_add_child_view(uui_view_t *view, uui_view_t *childview)
 }
 
 static int uui_layout_linear_set_property(uui_view_t *view, const char *name, uui_component_value_t *value) {
-    uui_layout_linear_t* linear = containerof(view, uui_layout_linear_t, viewgroup.view);
+    uui_layout_linear_t* linear = CONTAINER_OF(view, uui_layout_linear_t, viewgroup.view);
     (void)(linear);
 
     if (!AsciiStrCmp(name, "orientation")) {
@@ -298,7 +298,7 @@ int uui_layout_linear_initialize(uui_layout_linear_t *linear) {
     linear->viewgroup.view.comp_add_child_view = uui_view_comp_add_child_view;
     linear->viewgroup.view.comp_set_property = uui_layout_linear_set_property;
 
-    list_initialize(&linear->children_params);
+    uui_list_initialize(&linear->children_params);
     linear->set_orientation = uui_layout_linear_set_orientation;
     linear->orientation = UUI_LAYOUT_LINEAR_ORIENTATION_VERTICAL;
     linear->add_view = uui_layout_linear_add_view;
